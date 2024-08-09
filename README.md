@@ -3,7 +3,10 @@
 # **Languages:**
 > HTML CSS JAVASCRIPT ``I'm using internal css and javascript so remember this``
 
-# **Screenshot**
+```
+git clone https://github.com/CryptoQuestVikas/Responsive-Online-Code-Editor.git
+cd Responsive-Online-Code-Editor
+```
 
-![](img/code1.png)
+# **Screenshot**
 ![](img/code.png)
