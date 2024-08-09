@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Code Editor by vikas lahare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/theme/dracula.min.css">
+    <style>
+    * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background-color: #f0f0f0;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    text-align: center;
+    padding: 1rem;
+}
+
+main {
+    flex: 1;
+    padding: 2rem;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.editor-controls {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    background-color: #34495e;
+}
+
+#language-select {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 3px;
+}
+
+button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+.editor-container {
+    height: 400px;
+}
+
+.CodeMirror {
+    height: 100%;
+    font-size: 16px;
+}
+
+.output-container {
+    padding: 1rem;
+    background-color: #ecf0f1;
+}
+
+#output-frame {
+    width: 100%;
+    height: 300px;
+    border: none;
+    background-color: #fff;
+}
+
+footer {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    text-align: center;
+    padding: 1rem;
+}
+
+@media screen and (max-width: 768px) {
+    main {
+        padding: 1rem;
+    }
+
+    .editor-controls {
+        flex-direction: column;
+    }
+
+    #language-select, button {
+        margin-bottom: 0.5rem;
+    }
+
+    .editor-container {
+        height: 300px;
+    }
+
+    #output-frame {
+        height: 200px;
+    }
+}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Online Code Editor by vikas lahare</h1>
+    </header>
+    <main>
+        <div class="container">
+            <div class="editor-controls">
+                <select id="language-select">
+                    <option value="text/html">HTML</option>
+                    <option value="css">CSS</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">Python</option>
+                </select>
+                <button id="run-btn">Run</button>
+                <button id="save-btn">Save</button>
+            </div>
+            <div class="editor-container">
+                <textarea id="code-editor"></textarea>
+            </div>
+            <div class="output-container">
+                <h2>Output</h2>
+                <iframe id="output-frame"></iframe>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Online Code Editor. All rights reserved.</p>
+    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/python/python.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const codeEditor = document.getElementById('code-editor');
+    const languageSelect = document.getElementById('language-select');
+    const runBtn = document.getElementById('run-btn');
+    const saveBtn = document.getElementById('save-btn');
+    const outputFrame = document.getElementById('output-frame');
+
+    let editor = CodeMirror.fromTextArea(codeEditor, {
+        lineNumbers: true,
+        theme: 'dracula',
+        mode: 'htmlmixed',
+        autoCloseTags: true,
+        autoCloseBrackets: true,
+        indentUnit: 4,
+        tabSize: 4,
+        indentWithTabs: true,
+        lineWrapping: true
+    });
+
+    languageSelect.addEventListener('change', function() {
+        editor.setOption('mode', this.value);
+    });
+
+    runBtn.addEventListener('click', function() {
+        const code = editor.getValue();
+        const mode = editor.getOption('mode');
+
+        if (mode === 'text/html') {
+            outputFrame.srcdoc = code;
+        } else if (mode === 'javascript') {
+            try {
+                const result = eval(code);
+                outputFrame.srcdoc = `<pre>${result}</pre>`;
+            } catch (error) {
+                outputFrame.srcdoc = `<pre style="color: red;">${error}</pre>`;
+            }
+        } else if (mode === 'python') {
+            // For Python, we'd need a backend service to execute the code
+            outputFrame.srcdoc = '<p>Python execution is not supported in this demo.</p>';
+        } else {
+            outputFrame.srcdoc = '<p>Unable to run this language in the browser.</p>';
+        }
+    });
+
+    saveBtn.addEventListener('click', function() {
+        const code = editor.getValue();
+        const blob = new Blob([code], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'code.' + getFileExtension(editor.getOption('mode'));
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+
+    function getFileExtension(mode) {
+        switch (mode) {
+            case 'text/html':
+                return 'html';
+            case 'css':
+                return 'css';
+            case 'javascript':
+                return 'js';
+            case 'python':
+                return 'py';
+            default:
+                return 'txt';
+        }
+    }
+});
+    </script>
+</body>
+</html>
